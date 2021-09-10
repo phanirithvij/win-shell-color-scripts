@@ -15,7 +15,8 @@ function _help() {
         "-h, --help, help" "Print this help." \
         "-l, --list, list" "List all installed color scripts." \
         "-r, --random, random" "Run a random color script." \
-        "-e, --exec, exec" "Run a specified color script by SCRIPT NAME or INDEX."
+        "-e, --exec, exec" "Run a specified color script by SCRIPT NAME or INDEX."\
+        "-a, --all, all" "List the outputs of all colorscripts with their SCRIPT NAME"
 }
 
 function _list() {
@@ -68,6 +69,15 @@ function _run_colorscript() {
     fi
 }
 
+function _run_all() {
+    for s in $DIR_COLORSCRIPTS/*
+    do
+        echo "$(echo $s | awk -F '/' '{print $NF}'):"
+        echo "$($s)"
+        echo
+    done
+}
+
 case "$#" in
     0)
         _help
@@ -82,6 +92,9 @@ case "$#" in
                 ;;
             -r | --random | random)
                 _random
+                ;;
+            -a | --all | all)
+                _run_all
                 ;;
             *)
                 echo "Input error."
@@ -102,3 +115,4 @@ case "$#" in
         exit 1
         ;;
 esac
+
