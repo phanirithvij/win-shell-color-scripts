@@ -19,6 +19,8 @@ List all installed color scripts.
 Run a random color script.
 ** -e, --exec, exec
 Run specified color script by SCRIPT NAME or INDEX.
+** -a, --all, all
+Run all color scripts and list their SCRIPT NAMEs
 
 * FILES
 ** /usr/bin/colorscript
