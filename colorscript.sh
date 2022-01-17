@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Simple CLI for shell-color-scripts
 
@@ -70,10 +70,11 @@ function _run_colorscript() {
 }
 
 function _run_all() {
-    for s in $DIR_COLORSCRIPTS/*
+    IFS=$'\n'
+    for s in $(ls -1 $DIR_COLORSCRIPTS)
     do
         echo "$(echo $s | awk -F '/' '{print $NF}'):"
-        echo "$($s)"
+        echo "$($DIR_COLORSCRIPTS/$s)"
         echo
     done
 }
