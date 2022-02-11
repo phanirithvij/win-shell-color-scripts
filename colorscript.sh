@@ -3,10 +3,16 @@
 # Simple CLI for shell-color-scripts
 
 DIR_COLORSCRIPTS="/opt/shell-color-scripts/colorscripts"
-LS_CMD="$(command -v ls)"
+if command -v find &>/dev/null; then
+    LS_CMD="$(command -v find) ${DIR_COLORSCRIPTS} -maxdepth 1 -type f"
+else
+    LS_CMD="$(command -v ls) ${DIR_COLORSCRIPTS}"
+fi
+
+list_colorscripts="$($LS_CMD | xargs -I $ basename $ | cut -d ' ' -f 1 | nl)"
+length_colorscripts="$($LS_CMD | wc -l)"
+
 fmt_help="  %-20s\t%-54s\n"
-list_colorscripts="$($LS_CMD "${DIR_COLORSCRIPTS}" | cut -d ' ' -f 1 | nl)"
-length_colorscripts="$($LS_CMD "${DIR_COLORSCRIPTS}" | wc -l)"
 function _help() {
     echo "Description: A collection of terminal color scripts."
     echo ""
@@ -16,11 +22,12 @@ function _help() {
         "-l, --list, list" "List all installed color scripts." \
         "-r, --random, random" "Run a random color script." \
         "-e, --exec, exec" "Run a specified color script by SCRIPT NAME or INDEX."\
+        "-b, --blacklist, blacklist" "Blacklist a color script by SCRIPT NAME or INDEX." \
         "-a, --all, all" "List the outputs of all colorscripts with their SCRIPT NAME"
 }
 
 function _list() {
-    echo "There are "$($LS_CMD "${DIR_COLORSCRIPTS}" | wc -l)" installed color scripts:"
+    echo "There are "$($LS_CMD | wc -l)" installed color scripts:"
     echo "${list_colorscripts}"
 }
 
@@ -79,6 +86,13 @@ function _run_all() {
     done
 }
 
+function _blacklist_colorscript() { # by name only
+    if [ ! -d "${DIR_COLORSCRIPTS}/blacklisted" ]; then
+        sudo mkdir "${DIR_COLORSCRIPTS}/blacklisted"
+    fi
+    sudo mv "${DIR_COLORSCRIPTS}/$1" "${DIR_COLORSCRIPTS}/blacklisted"
+}
+
 case "$#" in
     0)
         _help
@@ -106,6 +120,8 @@ case "$#" in
     2)
         if [[ "$1" == "-e" || "$1" == "--exec" || "$1" == "exec" ]]; then
             _run_colorscript "$2"
+        elif [[ "$1" == "-b" || "$1" == "--blacklist" || "$1" == "blacklist" ]]; then
+            _blacklist_colorscript "$2"
         else
             echo "Input error."
             exit 1
